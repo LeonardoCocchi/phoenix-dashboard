@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PHOENIX Incubator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --font:'Inter',system-ui,-apple-system,sans-serif; --radius:14px; --radius-sm:10px; --tr:.25s ease; }
+[data-theme="dark"] {
+  --bg:#08080c;--bg2:#111118;--bg3:#18182a;--bgi:#1a1a2a;
+  --brd:#222233;--txt:#e8e8f0;--txt2:#7878a0;--txt3:#444460;
+  --acc:#6c8cff;--accg:rgba(108,140,255,.12);
+  --grn:#34d399;--grnbg:rgba(52,211,153,.10);--grnbr:rgba(52,211,153,.35);
+  --org:#fbbf24;--orgbg:rgba(251,191,36,.10);--orgbr:rgba(251,191,36,.35);
+  --red:#f87171;--redbg:rgba(248,113,113,.10);--redbr:rgba(248,113,113,.35);
+  --sh:0 2px 16px rgba(0,0,0,.5);
+}
+[data-theme="light"] {
+  --bg:#f2f4f7;--bg2:#ffffff;--bg3:#f8f9fc;--bgi:#f0f2f5;
+  --brd:#dde0e8;--txt:#1a1a2e;--txt2:#6b7280;--txt3:#9ca3af;
+  --acc:#4f6df5;--accg:rgba(79,109,245,.08);
+  --grn:#059669;--grnbg:rgba(5,150,105,.06);--grnbr:rgba(5,150,105,.3);
+  --org:#d97706;--orgbg:rgba(217,119,6,.06);--orgbr:rgba(217,119,6,.3);
+  --red:#dc2626;--redbg:rgba(220,38,38,.06);--redbr:rgba(220,38,38,.3);
+  --sh:0 2px 16px rgba(0,0,0,.05);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14px;line-height:1.5;
+  padding:12px;max-width:1300px;margin:0 auto;display:flex;flex-direction:column;
+  transition:background var(--tr),color var(--tr);}
+
+/* HEADER */
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
+.header-left{display:flex;align-items:center;gap:8px}
+.logo{width:30px;height:30px;background:linear-gradient(135deg,#6c8cff,#a78bfa);border-radius:7px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
+.header h1{font-size:1em;font-weight:700;letter-spacing:-.02em}
+.header-info{display:flex;gap:14px;font-size:.7em;color:var(--txt2);font-weight:500}
+.header-info .hv{font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
+.header-right{display:flex;align-items:center;gap:5px}
+.tbtn{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius-sm);
+  padding:4px 8px;font-size:.72em;font-weight:600;color:var(--txt2);cursor:pointer;
+  transition:all var(--tr);font-family:var(--font)}
+.tbtn:hover{color:var(--txt);border-color:var(--acc)}
+
+/* CONN BAR */
+.conn{display:flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--radius-sm);
+  font-size:.68em;font-weight:500;margin-bottom:8px;flex-shrink:0}
+.conn .d{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.conn.ok{background:var(--grnbg);color:var(--grn)}.conn.ok .d{background:var(--grn);box-shadow:0 0 6px var(--grn)}
+.conn.no{background:var(--redbg);color:var(--red)}.conn.no .d{background:var(--red)}
+.conn.wait{background:var(--orgbg);color:var(--org)}.conn.wait .d{background:var(--org);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.offbanner{background:var(--redbg);border:1px solid var(--red);color:var(--red);text-align:center;
+  padding:6px;border-radius:var(--radius-sm);margin-bottom:8px;display:none;font-weight:600;font-size:.8em;flex-shrink:0}
+
+/* MAIN: top half sensors+controls, bottom half chart */
+.main{flex:1;display:flex;flex-direction:column;min-height:0}
+.top-half{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;flex-shrink:0}
+
+/* SENSORS — fill left half */
+.sensors{display:flex;flex-direction:column;gap:8px}
+.srow{display:flex;gap:8px;align-items:stretch;flex:1}
+.hero{flex:1;background:var(--bg2);border:2px solid var(--brd);border-radius:var(--radius);
+  padding:14px 18px;text-align:center;box-shadow:var(--sh);transition:all var(--tr);
+  display:flex;flex-direction:column;justify-content:center}
+.hero .hl{font-size:.6em;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--txt2);margin-bottom:2px}
+.hero .hv{font-size:2.8em;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.03em;line-height:1.1}
+.hero .hu{font-size:.28em;font-weight:500;color:var(--txt2);vertical-align:super}
+.hero.sg{border-color:var(--grnbr);background:var(--grnbg)}.hero.sg .hv{color:var(--grn)}
+.hero.so{border-color:var(--orgbr);background:var(--orgbg)}.hero.so .hv{color:var(--org)}
+.hero.sr{border-color:var(--redbr);background:var(--redbg)}.hero.sr .hv{color:var(--red)}
+
+.sides{display:flex;flex-direction:column;gap:6px;flex:0 0 120px}
+.mc{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius-sm);padding:8px 10px;
+  text-align:center;flex:1;display:flex;flex-direction:column;justify-content:center;transition:all var(--tr)}
+.mc:hover{border-color:var(--acc)}
+.mc .ml{font-size:.52em;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--txt2);margin-bottom:1px}
+.mc .mv{font-size:1em;font-weight:700;font-variant-numeric:tabular-nums}
+.mc .mu{font-size:.65em;color:var(--txt2)}
+
+.secrow{display:flex;gap:6px}
+.sc{flex:1;background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius-sm);
+  padding:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px}
+.sc .sl{font-size:.52em;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--txt2)}
+.sc .sv{font-size:.9em;font-weight:700;font-variant-numeric:tabular-nums}
+.sc .su{font-size:.6em;color:var(--txt2)}
+
+/* CONTROLS (telecomando) — fill right half */
+.ctrl{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--sh);display:flex;flex-direction:column;gap:10px;justify-content:center}
+.ctrl-title{font-size:.72em;font-weight:600;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+.ctrl-btns{display:flex;flex-direction:column;gap:8px}
+.btn{border:none;border-radius:var(--radius-sm);padding:16px;font-family:var(--font);
+  font-size:1.05em;font-weight:700;cursor:pointer;color:#fff;transition:all var(--tr);width:100%;letter-spacing:.02em}
+.btn:active{transform:scale(.97)}
+.btn-go{background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 2px 10px rgba(22,163,74,.25)}
+.btn-go:hover{box-shadow:0 4px 20px rgba(22,163,74,.35)}
+.btn-stop{background:linear-gradient(135deg,#dc2626,#b91c1c);box-shadow:0 2px 10px rgba(220,38,38,.25)}
+.btn-stop:hover{box-shadow:0 4px 20px rgba(220,38,38,.35)}
+
+/* Setpoint + Fan inline */
+.ctrl-params{display:flex;gap:6px}
+.cp-item{flex:1}
+.cp-item label{display:block;font-size:.55em;font-weight:600;color:var(--txt2);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:2px}
+.cp-item input{width:100%;background:var(--bgi);border:1px solid var(--brd);color:var(--txt);
+  border-radius:6px;padding:7px 8px;font-family:var(--font);font-size:.85em;font-weight:600;
+  transition:border-color var(--tr);text-align:center}
+.cp-item input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--accg)}
+.btn-apply{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px;
+  font-family:var(--font);font-size:.78em;font-weight:700;cursor:pointer;width:100%;
+  transition:all var(--tr)}
+.btn-apply:hover{opacity:.85}
+
+/* Advanced PID dropdown */
+.adv-toggle{background:none;border:none;color:var(--txt3);font-family:var(--font);
+  font-size:.65em;font-weight:500;cursor:pointer;padding:2px 0;transition:color var(--tr);
+  display:flex;align-items:center;gap:4px}
+.adv-toggle:hover{color:var(--txt2)}
+.adv-toggle .arrow{transition:transform var(--tr);display:inline-block}
+.adv-toggle.open .arrow{transform:rotate(180deg)}
+.adv-content{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.adv-content.open{max-height:200px}
+.adv-grid{display:flex;gap:5px;padding-top:6px}
+.adv-grid .cp-item{flex:1;min-width:0}
+
+/* Utils */
+.ctrl-utils{display:flex;gap:6px;flex-wrap:wrap}
+.ubtn{background:var(--bgi);border:1px solid var(--brd);border-radius:6px;padding:8px 14px;
+  font-family:var(--font);font-size:.76em;font-weight:600;color:var(--txt2);cursor:pointer;
+  transition:all var(--tr);flex:1;text-align:center}
+.ubtn:hover{border-color:var(--acc);color:var(--acc);background:var(--accg)}
+.ubtn.dng{color:var(--red);border-color:transparent}.ubtn.dng:hover{border-color:var(--red);background:var(--redbg)}
+
+/* CHART (bottom half, fills remaining space) */
+.bottom-half{flex:1;min-height:250px;display:flex;flex-direction:column}
+.chart-box{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius);
+  padding:12px;box-shadow:var(--sh);flex:1;display:flex;flex-direction:column;min-height:0}
+.chart-hdr{font-size:.68em;font-weight:600;color:var(--txt2);text-transform:uppercase;
+  letter-spacing:.05em;margin-bottom:6px;flex-shrink:0}
+.chart-wrap{flex:1;position:relative;min-height:0}
+.chart-wrap canvas{position:absolute;top:0;left:0;width:100%!important;height:100%!important}
+
+/* FOOTER */
+.footer{text-align:center;font-size:.6em;color:var(--txt3);padding:4px 0;flex-shrink:0}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .top-half{grid-template-columns:1fr}
+  .ctrl{min-width:unset}
+  .ctrl-btns{flex-direction:row}.ctrl-btns .btn{flex:1}
+  .srow{flex-wrap:wrap}
+  .hero{min-width:120px;flex:1}.hero .hv{font-size:2em}
+  .sides{flex-direction:row;min-width:unset;flex:1}
+  .header-info{display:none}
+  .bottom-half{min-height:200px}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left"><div class="logo">P</div><h1>PHOENIX Incubator</h1></div>
+  <div class="header-info">
+    <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
+    <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
+  </div>
+  <div class="header-right">
+    <button class="tbtn" id="langBtn" onclick="toggleLang()">IT</button>
+    <button class="tbtn" id="themeBtn" onclick="toggleTheme()">&#9788;</button>
+  </div>
+</div>
+
+<div id="connBar" class="conn wait"><div class="d"></div><span id="connText">MQTT: Connecting...</span></div>
+<div id="offline" class="offbanner"><span data-i18n="offline">NO DATA — Incubator offline?</span></div>
+
+<div class="main">
+  <!-- TOP HALF -->
+  <div class="top-half">
+    <!-- LEFT: sensors -->
+    <div class="sensors">
+      <div class="srow">
+        <div class="hero" id="hero_temp">
+          <div class="hl" data-i18n="temp">Temperature</div>
+          <div class="hv"><span id="v_t">--</span><span class="hu">°C</span></div>
+        </div>
+        <div class="sides">
+          <div class="mc"><div class="ml" data-i18n="temp_avg">Temp avg 5m</div><div class="mv"><span id="v_ta">--</span> <span class="mu">°C</span></div></div>
+          <div class="mc"><div class="ml">Setpoint</div><div class="mv"><span id="v_tset">--</span> <span class="mu">°C</span></div></div>
+        </div>
+      </div>
+      <div class="srow">
+        <div class="hero" id="hero_rh">
+          <div class="hl" data-i18n="humidity">Humidity</div>
+          <div class="hv"><span id="v_rh">--</span><span class="hu">%</span></div>
+        </div>
+        <div class="sides">
+          <div class="mc"><div class="ml" data-i18n="hum_avg">RH avg 5m</div><div class="mv"><span id="v_rha">--</span> <span class="mu">%</span></div></div>
+          <div class="mc"><div class="ml" data-i18n="rh_target">RH Target</div><div class="mv">&gt;80 <span class="mu">%</span></div></div>
+        </div>
+      </div>
+      <div class="secrow">
+        <div class="sc"><span class="sl">CO₂</span><span class="sv" id="v_co2">--</span><span class="su">ppm</span></div>
+        <div class="sc"><span class="sl">Heater</span><span class="sv" id="v_h">--</span><span class="su">%</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: telecomando -->
+    <div class="ctrl">
+      <div class="ctrl-title" data-i18n="controls">Controls</div>
+      <div class="ctrl-btns">
+        <button class="btn btn-go" onclick="doStart()"><span data-i18n="start">START</span></button>
+        <button class="btn btn-stop" onclick="doAbort()"><span data-i18n="abort">ABORT</span></button>
+      </div>
+      <div class="ctrl-params">
+        <div class="cp-item"><label>Setpoint °C</label><input id="p_tset" type="number" step="0.1" value="37.0"></div>
+        <div class="cp-item"><label data-i18n="fan">Fan %</label><input id="p_fan" type="number" step="1" value="35"></div>
+      </div>
+      <button class="btn-apply" onclick="doApply()" data-i18n="apply">Apply</button>
+
+      <!-- Advanced PID (hidden) -->
+      <button class="adv-toggle" id="advToggle" onclick="toggleAdv()">
+        <span class="arrow">&#9660;</span> <span data-i18n="pid_advanced">PID Advanced</span>
+      </button>
+      <div class="adv-content" id="advContent">
+        <div class="adv-grid">
+          <div class="cp-item"><label>Kp</label><input id="p_kp" type="number" step="0.1" value="8.0"></div>
+          <div class="cp-item"><label>Ki</label><input id="p_ki" type="number" step="0.001" value="0.02"></div>
+          <div class="cp-item"><label>Kd</label><input id="p_kd" type="number" step="1" value="80.0"></div>
+        </div>
+      </div>
+
+      <div class="ctrl-utils">
+        <button class="ubtn" onclick="doNtfyTest()" data-i18n="test_notify">Test Notify</button>
+        <button class="ubtn dng" onclick="doErase()" data-i18n="erase_log">Erase Log</button>
+        <button class="ubtn" onclick="doDownloadCSV()" data-i18n="download_csv">Download CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM HALF: chart fills remaining space -->
+  <div class="bottom-half">
+    <div class="chart-box">
+      <div class="chart-hdr" data-i18n="chart_title">Temperature History</div>
+      <div class="chart-wrap"><canvas id="chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer" id="sbar"><span data-i18n="connecting_broker">Connecting to MQTT broker...</span></div>
+
+<script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const LANG={
+  en:{temp:'Temperature',temp_avg:'Temp avg 5m',humidity:'Humidity',hum_avg:'RH avg 5m',
+    rh_target:'RH Target',chart_title:'Temperature History',controls:'Controls',
+    parameters:'Parameters',fan:'Fan %',apply:'Apply',erase_log:'Erase Log',
+    test_notify:'Test Notify',download_csv:'Download CSV',abort:'ABORT',start:'START',
+    offline:'NO DATA — Incubator offline?',connecting_broker:'Connecting to MQTT broker...',
+    confirm_abort:'ABORT: Turn off heater and fan?',confirm_erase:'Erase the CSV log from flash?',
+    mqtt_not_connected:'MQTT not connected!',running:'RUNNING',aborted:'ABORTED',
+    mqtt_connected:'MQTT: Connected',mqtt_connecting:'MQTT: Connecting...',
+    mqtt_reconnecting:'MQTT: Reconnecting...',mqtt_disconnected:'MQTT: Disconnected',
+    pid_advanced:'PID Advanced'},
+  it:{temp:'Temperatura',temp_avg:'Temp media 5m',humidity:'Umidità',hum_avg:'UR media 5m',
+    rh_target:'UR Target',chart_title:'Storico Temperature',controls:'Controlli',
+    parameters:'Parametri',fan:'Ventola %',apply:'Applica',erase_log:'Cancella Log',
+    test_notify:'Test Notifica',download_csv:'Scarica CSV',abort:'ARRESTA',start:'AVVIA',
+    offline:'NESSUN DATO — Incubatore offline?',connecting_broker:'Connessione al broker MQTT...',
+    confirm_abort:'ARRESTO: Spegnere riscaldatore e ventola?',confirm_erase:'Cancellare il log CSV dalla flash?',
+    mqtt_not_connected:'MQTT non connesso!',running:'IN ESECUZIONE',aborted:'ARRESTATO',
+    mqtt_connected:'MQTT: Connesso',mqtt_connecting:'MQTT: Connessione...',
+    mqtt_reconnecting:'MQTT: Riconnessione...',mqtt_disconnected:'MQTT: Disconnesso',
+    pid_advanced:'PID Avanzato'}
+};
+let cLang=localStorage.getItem('phoenix-lang')||'en';
+function t(k){return LANG[cLang][k]||LANG.en[k]||k}
+function applyLang(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=t(el.dataset.i18n)});
+  document.getElementById('langBtn').textContent=cLang==='en'?'IT':'EN';
+}
+function toggleLang(){cLang=cLang==='en'?'it':'en';localStorage.setItem('phoenix-lang',cLang);applyLang()}
+
+let cTheme=localStorage.getItem('phoenix-theme')||'dark';
+document.documentElement.setAttribute('data-theme',cTheme);
+function updateThemeBtn(){document.getElementById('themeBtn').textContent=cTheme==='dark'?'\u2600':'\uD83C\uDF19'}
+function toggleTheme(){
+  cTheme=cTheme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',cTheme);
+  localStorage.setItem('phoenix-theme',cTheme);updateThemeBtn();updateChartTheme();
+}
+
+function toggleAdv(){
+  const t=document.getElementById('advToggle'),c=document.getElementById('advContent');
+  const open=c.classList.toggle('open');t.classList.toggle('open',open);
+}
+
+const BROKER='wss://broker.emqx.io:8084/mqtt';
+const T_STATUS='phoenix-incubator-leo/status',T_CMD='phoenix-incubator-leo/cmd';
+let mqtt_c=null,lastData=0,chart=null;
+let labels=[],dSht=[],dScd=[],dSet=[];
+
+function fmt(v,d){return(v===null||v===undefined||isNaN(v))?'--':v.toFixed(d)}
+function upStr(s){let h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(ss).padStart(2,'0')}
+function setHero(id,c){document.getElementById(id).className='hero s'+c}
+function setConn(s,txt){
+  document.getElementById('connBar').className='conn '+s;
+  document.getElementById('connText').textContent=txt;
+}
+
+function gCC(){const d=cTheme==='dark';return{grid:d?'#1a1a2a':'#e8e8f0',tick:d?'#555570':'#9ca3af',leg:d?'#7878a0':'#6b7280'}}
+function initChart(){
+  try{
+    const ctx=document.getElementById('chart').getContext('2d'),c=gCC();
+    chart=new Chart(ctx,{type:'line',
+      data:{labels,datasets:[
+        {label:'SHT85',data:dSht,borderColor:'#6c8cff',borderWidth:2,pointRadius:0,tension:.3,fill:false},
+        {label:'SCD30',data:dScd,borderColor:'#f59e0b',borderWidth:2,pointRadius:0,tension:.3,fill:false},
+        {label:'Setpoint',data:dSet,borderColor:'rgba(52,211,153,.3)',borderWidth:1.5,pointRadius:0,borderDash:[6,4],fill:false}
+      ]},
+      options:{animation:false,responsive:true,maintainAspectRatio:false,
+        interaction:{intersect:false,mode:'index'},
+        plugins:{
+          legend:{labels:{color:c.leg,font:{family:'Inter',size:11,weight:500},usePointStyle:true,pointStyle:'circle',padding:16}},
+          tooltip:{backgroundColor:cTheme==='dark'?'#18182a':'#fff',titleColor:cTheme==='dark'?'#e8e8f0':'#1a1a2e',
+            bodyColor:cTheme==='dark'?'#7878a0':'#6b7280',borderColor:cTheme==='dark'?'#333':'#ddd',
+            borderWidth:1,cornerRadius:8,padding:10,titleFont:{family:'Inter',weight:600},bodyFont:{family:'Inter'}}
+        },
+        scales:{x:{display:false},
+          y:{ticks:{color:c.tick,font:{family:'Inter',size:11}},grid:{color:c.grid,lineWidth:1},
+            border:{display:false},suggestedMin:36,suggestedMax:38}}
+      }
+    });
+  }catch(e){console.log('Chart err:',e)}
+}
+function updateChartTheme(){
+  if(!chart)return;const c=gCC(),d=cTheme==='dark';
+  chart.options.scales.y.ticks.color=c.tick;chart.options.scales.y.grid.color=c.grid;
+  chart.options.plugins.legend.labels.color=c.leg;
+  chart.options.plugins.tooltip.backgroundColor=d?'#18182a':'#fff';
+  chart.options.plugins.tooltip.titleColor=d?'#e8e8f0':'#1a1a2e';
+  chart.options.plugins.tooltip.bodyColor=d?'#7878a0':'#6b7280';
+  chart.options.plugins.tooltip.borderColor=d?'#333':'#ddd';
+  chart.update();
+}
+
+function processStatus(d){
+  lastData=Date.now();document.getElementById('offline').style.display='none';
+  document.getElementById('v_t').textContent=fmt(d.t_pv,2);
+  document.getElementById('v_ta').textContent=fmt(d.t_avg,2);
+  document.getElementById('v_tset').textContent=fmt(d.t_set,1);
+  document.getElementById('v_rh').textContent=fmt(d.rh_pv,1);
+  document.getElementById('v_rha').textContent=fmt(d.rh_avg,1);
+  document.getElementById('v_co2').textContent=fmt(d.co2,0);
+  document.getElementById('v_h').textContent=fmt(d.heater_pct,1);
+  document.getElementById('v_up').textContent=upStr(d.uptime_s);
+  document.getElementById('v_rssi').textContent=d.wifi_rssi;
+
+  let tE=Math.abs(d.t_pv-d.t_set);
+  if(!d.ok_sht&&!d.ok_scd)setHero('hero_temp','r');
+  else if(tE>1)setHero('hero_temp','r');
+  else if(tE>0.5)setHero('hero_temp','o');
+  else setHero('hero_temp','g');
+
+  let rh=d.rh_pv;
+  if((!d.ok_sht&&!d.ok_scd)||rh<0)setHero('hero_rh','r');
+  else if(rh<60)setHero('hero_rh','r');
+  else if(rh<80)setHero('hero_rh','o');
+  else setHero('hero_rh','g');
+
+  if(document.activeElement.id!=='p_tset')document.getElementById('p_tset').value=d.t_set;
+  if(document.activeElement.id!=='p_kp')document.getElementById('p_kp').value=d.kp;
+  if(document.activeElement.id!=='p_ki')document.getElementById('p_ki').value=d.ki;
+  if(document.activeElement.id!=='p_kd')document.getElementById('p_kd').value=d.kd;
+  if(document.activeElement.id!=='p_fan')document.getElementById('p_fan').value=d.fan_pct;
+
+  let now=new Date();
+  let ts=now.getHours()+':'+String(now.getMinutes()).padStart(2,'0')+':'+String(now.getSeconds()).padStart(2,'0');
+  labels.push(ts);dSht.push(d.ok_sht?d.t_sht:null);dScd.push(d.ok_scd?d.t_scd:null);dSet.push(d.t_set);
+  if(labels.length>900){labels.shift();dSht.shift();dScd.shift();dSet.shift()}
+  if(chart)chart.update();
+  document.getElementById('sbar').textContent=(d.running?t('running'):t('aborted'))+' | Log: '+d.log_entries+' | MQTT OK';
+}
+
+function sendCmd(o){if(mqtt_c&&mqtt_c.connected)mqtt_c.publish(T_CMD,JSON.stringify(o));else alert(t('mqtt_not_connected'))}
+function doAbort(){if(!confirm(t('confirm_abort')))return;sendCmd({cmd:'abort'})}
+function doStart(){sendCmd({cmd:'start'})}
+function doApply(){sendCmd({cmd:'set',t_set:parseFloat(document.getElementById('p_tset').value),
+  kp:parseFloat(document.getElementById('p_kp').value),ki:parseFloat(document.getElementById('p_ki').value),
+  kd:parseFloat(document.getElementById('p_kd').value),fan_pct:parseFloat(document.getElementById('p_fan').value)})}
+function doErase(){if(!confirm(t('confirm_erase')))return;sendCmd({cmd:'erase'})}
+function doNtfyTest(){sendCmd({cmd:'notify_test'})}
+function doDownloadCSV(){sendCmd({cmd:'dump'})}
+
+function connectMQTT(){
+  setConn('wait',t('mqtt_connecting'));
+  const cid='phoenix-dash-'+Math.random().toString(16).substring(2,8);
+  mqtt_c=mqtt.connect(BROKER,{clientId:cid,clean:true,connectTimeout:10000,reconnectPeriod:3000});
+  mqtt_c.on('connect',()=>{setConn('ok',t('mqtt_connected'));mqtt_c.subscribe(T_STATUS)});
+  mqtt_c.on('message',(topic,msg)=>{if(topic===T_STATUS){try{processStatus(JSON.parse(msg.toString()))}catch(e){}}});
+  mqtt_c.on('error',e=>{setConn('no',t('mqtt_disconnected')+' — '+e.message)});
+  mqtt_c.on('close',()=>{setConn('no',t('mqtt_reconnecting'))});
+  mqtt_c.on('reconnect',()=>{setConn('wait',t('mqtt_reconnecting'))});
+}
+
+setInterval(()=>{if(lastData>0&&Date.now()-lastData>10000)document.getElementById('offline').style.display='block'},3000);
+
+updateThemeBtn();applyLang();initChart();connectMQTT();
+</script>
+</body>
+</html>
