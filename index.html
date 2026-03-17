@@ -35,8 +35,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 /* HEADER */
 .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
 .header-left{display:flex;align-items:center;gap:8px}
-.logo{width:30px;height:30px;background:linear-gradient(135deg,#6c8cff,#a78bfa);border-radius:7px;
-  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
+.logo{height:28px;width:auto}
+[data-theme="dark"] .logo{filter:brightness(0) invert(1)}
 .header h1{font-size:1em;font-weight:700;letter-spacing:-.02em}
 .header-info{display:flex;gap:14px;font-size:.7em;color:var(--txt2);font-weight:500}
 .header-info .hv{font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
@@ -164,7 +164,7 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 <body>
 
 <div class="header">
-  <div class="header-left"><div class="logo">P</div><h1>PHOENIX Incubator</h1></div>
+  <div class="header-left"><img class="logo" src="logo.png" alt="PHOENIX"><h1>Incubator</h1></div>
   <div class="header-info">
     <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
     <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
