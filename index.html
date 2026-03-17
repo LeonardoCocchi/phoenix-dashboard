@@ -266,6 +266,7 @@ const LANG={
     mqtt_not_connected:'MQTT not connected!',running:'RUNNING',aborted:'ABORTED',
     mqtt_connected:'MQTT: Connected',mqtt_connecting:'MQTT: Connecting...',
     mqtt_reconnecting:'MQTT: Reconnecting...',mqtt_disconnected:'MQTT: Disconnected',
+    waiting_data:'waiting for incubator...',data_live:'receiving data',
     pid_advanced:'PID Advanced'},
   it:{temp:'Temperatura',temp_avg:'Temp media 5m',humidity:'Umidità',hum_avg:'UR media 5m',
     rh_target:'UR Target',chart_title:'Storico Temperature',controls:'Controlli',
@@ -276,6 +277,7 @@ const LANG={
     mqtt_not_connected:'MQTT non connesso!',running:'IN ESECUZIONE',aborted:'ARRESTATO',
     mqtt_connected:'MQTT: Connesso',mqtt_connecting:'MQTT: Connessione...',
     mqtt_reconnecting:'MQTT: Riconnessione...',mqtt_disconnected:'MQTT: Disconnesso',
+    waiting_data:'in attesa dell\'incubatore...',data_live:'dati in arrivo',
     pid_advanced:'PID Avanzato'}
 };
 let cLang=localStorage.getItem('phoenix-lang')||'en';
@@ -351,6 +353,7 @@ function updateChartTheme(){
 
 function processStatus(d){
   lastData=Date.now();document.getElementById('offline').style.display='none';
+  setConn('ok',t('mqtt_connected')+' — '+t('data_live'));
   document.getElementById('v_t').textContent=fmt(d.t_pv,2);
   document.getElementById('v_ta').textContent=fmt(d.t_avg,2);
   document.getElementById('v_tset').textContent=fmt(d.t_set,1);
@@ -401,14 +404,19 @@ function connectMQTT(){
   setConn('wait',t('mqtt_connecting'));
   const cid='phoenix-dash-'+Math.random().toString(16).substring(2,8);
   mqtt_c=mqtt.connect(BROKER,{clientId:cid,clean:true,connectTimeout:10000,reconnectPeriod:3000});
-  mqtt_c.on('connect',()=>{setConn('ok',t('mqtt_connected'));mqtt_c.subscribe(T_STATUS)});
+  mqtt_c.on('connect',()=>{setConn('wait',t('mqtt_connected')+' — '+t('waiting_data'));mqtt_c.subscribe(T_STATUS)});
   mqtt_c.on('message',(topic,msg)=>{if(topic===T_STATUS){try{processStatus(JSON.parse(msg.toString()))}catch(e){}}});
   mqtt_c.on('error',e=>{setConn('no',t('mqtt_disconnected')+' — '+e.message)});
   mqtt_c.on('close',()=>{setConn('no',t('mqtt_reconnecting'))});
   mqtt_c.on('reconnect',()=>{setConn('wait',t('mqtt_reconnecting'))});
 }
 
-setInterval(()=>{if(lastData>0&&Date.now()-lastData>10000)document.getElementById('offline').style.display='block'},3000);
+setInterval(()=>{
+  if(lastData>0&&Date.now()-lastData>10000){
+    document.getElementById('offline').style.display='block';
+    if(mqtt_c&&mqtt_c.connected)setConn('wait',t('mqtt_connected')+' — '+t('waiting_data'));
+  }
+},3000);
 
 updateThemeBtn();applyLang();initChart();connectMQTT();
 </script>
