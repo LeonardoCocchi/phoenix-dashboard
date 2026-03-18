@@ -33,11 +33,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
   transition:background var(--tr),color var(--tr);}
 
 /* HEADER */
-.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-shrink:0}
-.header-left{display:flex;align-items:center;gap:8px}
-.logo{height:28px;width:auto}
+.header{display:flex;flex-direction:column;align-items:center;margin-bottom:8px;flex-shrink:0;gap:4px}
+.header-brand{display:flex;align-items:center;justify-content:center;gap:14px;width:100%}
+.logo{height:64px;width:auto}
 [data-theme="dark"] .logo{filter:brightness(0) invert(1)}
-.header h1{font-size:1em;font-weight:700;letter-spacing:-.02em}
+.header h1{font-size:1.3em;font-weight:700;letter-spacing:-.02em;color:var(--txt2)}
+.header-bar{display:flex;align-items:center;justify-content:space-between;width:100%}
 .header-info{display:flex;gap:14px;font-size:.7em;color:var(--txt2);font-weight:500}
 .header-info .hv{font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
 .header-right{display:flex;align-items:center;gap:5px}
@@ -156,6 +157,8 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
   .srow{flex-wrap:wrap}
   .hero{min-width:120px;flex:1}.hero .hv{font-size:2em}
   .sides{flex-direction:row;min-width:unset;flex:1}
+  .logo{height:48px}
+  .header h1{font-size:1em}
   .header-info{display:none}
   .bottom-half{min-height:200px}
 }
@@ -164,14 +167,16 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 <body>
 
 <div class="header">
-  <div class="header-left"><img class="logo" src="logo.png" alt="PHOENIX"><h1>Incubator</h1></div>
-  <div class="header-info">
-    <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
-    <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
-  </div>
-  <div class="header-right">
-    <button class="tbtn" id="langBtn" onclick="toggleLang()">IT</button>
-    <button class="tbtn" id="themeBtn" onclick="toggleTheme()">&#9788;</button>
+  <div class="header-brand"><img class="logo" src="logo.png" alt="PHOENIX"><h1>Incubator</h1></div>
+  <div class="header-bar">
+    <div class="header-info">
+      <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
+      <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
+    </div>
+    <div class="header-right">
+      <button class="tbtn" id="langBtn" onclick="toggleLang()">IT</button>
+      <button class="tbtn" id="themeBtn" onclick="toggleTheme()">&#9788;</button>
+    </div>
   </div>
 </div>
 
