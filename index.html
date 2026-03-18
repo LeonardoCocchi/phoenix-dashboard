@@ -300,9 +300,10 @@ function toggleLang(){cLang=cLang==='en'?'it':'en';localStorage.setItem('phoenix
 let cTheme=localStorage.getItem('phoenix-theme')||'dark';
 document.documentElement.setAttribute('data-theme',cTheme);
 function updateThemeBtn(){document.getElementById('themeBtn').textContent=cTheme==='dark'?'\u2600':'\uD83C\uDF19'}
+function updateLogo(){document.querySelector('.logo').src=cTheme==='dark'?'logo.png':'logo-light.png'}
 function toggleTheme(){
   cTheme=cTheme==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',cTheme);
-  localStorage.setItem('phoenix-theme',cTheme);updateThemeBtn();updateChartTheme();
+  localStorage.setItem('phoenix-theme',cTheme);updateThemeBtn();updateChartTheme();updateLogo();
 }
 
 function toggleAdv(){
@@ -427,7 +428,7 @@ setInterval(()=>{
   }
 },3000);
 
-updateThemeBtn();applyLang();initChart();connectMQTT();
+updateThemeBtn();updateLogo();applyLang();initChart();connectMQTT();
 </script>
 </body>
 </html>
