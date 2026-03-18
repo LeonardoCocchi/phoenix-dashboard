@@ -34,11 +34,12 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 
 /* HEADER */
 .header{display:flex;flex-direction:column;align-items:center;margin-bottom:8px;flex-shrink:0;gap:4px}
-.header-brand{display:flex;align-items:center;justify-content:center;gap:14px;width:100%}
+.header-brand{display:flex;justify-content:center;width:100%}
 .logo{height:64px;width:auto}
 [data-theme="dark"] .logo{filter:brightness(0) invert(1)}
-.header h1{font-size:1.3em;font-weight:700;letter-spacing:-.02em;color:var(--txt2)}
+.header h1{font-size:1.1em;font-weight:700;letter-spacing:-.02em}
 .header-bar{display:flex;align-items:center;justify-content:space-between;width:100%}
+.header-left-col{display:flex;flex-direction:column;gap:1px}
 .header-info{display:flex;gap:14px;font-size:.7em;color:var(--txt2);font-weight:500}
 .header-info .hv{font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
 .header-right{display:flex;align-items:center;gap:5px}
@@ -167,11 +168,14 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 <body>
 
 <div class="header">
-  <div class="header-brand"><img class="logo" src="logo.png" alt="PHOENIX"><h1>Incubator</h1></div>
+  <div class="header-brand"><img class="logo" src="logo.png" alt="PHOENIX"></div>
   <div class="header-bar">
-    <div class="header-info">
-      <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
-      <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
+    <div class="header-left-col">
+      <h1>Incubator</h1>
+      <div class="header-info">
+        <span>Uptime: <span class="hv" id="v_up">--:--:--</span></span>
+        <span>WiFi: <span class="hv" id="v_rssi">--</span> dBm</span>
+      </div>
     </div>
     <div class="header-right">
       <button class="tbtn" id="langBtn" onclick="toggleLang()">IT</button>
