@@ -367,7 +367,7 @@ function processStatus(d){
   document.getElementById('v_t').textContent=fmt(d.t_pv,2);
   document.getElementById('v_ta').textContent=fmt(d.t_avg,2);
   document.getElementById('v_tset').textContent=fmt(d.t_set,1);
-  document.getElementById('v_rh').textContent=fmt(d.rh_pv,1);
+  document.getElementById('v_rh').textContent=fmt(d.rh_scd,1);
   document.getElementById('v_rha').textContent=fmt(d.rh_avg,1);
   document.getElementById('v_co2').textContent=fmt(d.co2,0);
   document.getElementById('v_h').textContent=fmt(d.heater_pct,1);
@@ -380,7 +380,7 @@ function processStatus(d){
   else if(tE>0.5)setHero('hero_temp','o');
   else setHero('hero_temp','g');
 
-  let rh=d.rh_pv;
+  let rh=d.rh_scd;
   if((!d.ok_sht&&!d.ok_scd)||rh<0)setHero('hero_rh','r');
   else if(rh<60)setHero('hero_rh','r');
   else if(rh<80)setHero('hero_rh','o');
