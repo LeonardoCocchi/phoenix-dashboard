@@ -150,6 +150,32 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
 /* FOOTER */
 .footer{text-align:center;font-size:.6em;color:var(--txt3);padding:4px 0;flex-shrink:0}
 
+/* LOCK / PIN */
+.tbtn.locked{color:var(--org);border-color:var(--orgbr);background:var(--orgbg)}
+.tbtn.unlocked{color:var(--grn);border-color:var(--grnbr);background:var(--grnbg)}
+body.ui-locked .ctrl-btns .btn,body.ui-locked .btn-apply,body.ui-locked .ubtn{
+  opacity:.55;filter:grayscale(.3)}
+body.ui-locked .ctrl::before{content:"\01F512  VIEW ONLY";position:absolute;top:8px;right:12px;
+  font-size:.6em;font-weight:700;color:var(--org);letter-spacing:.08em;pointer-events:none;z-index:2}
+.ctrl{position:relative}
+.modal-ovl{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;
+  justify-content:center;z-index:9999;backdrop-filter:blur(3px)}
+.modal-box{background:var(--bg2);border:1px solid var(--brd);border-radius:var(--radius);
+  padding:20px;min-width:300px;max-width:90vw;box-shadow:var(--sh)}
+.modal-title{font-size:1em;font-weight:700;color:var(--txt);margin-bottom:6px}
+.modal-msg{font-size:.8em;color:var(--txt2);margin-bottom:12px}
+.modal-box input{width:100%;background:var(--bgi);border:1px solid var(--brd);color:var(--txt);
+  border-radius:var(--radius-sm);padding:10px 12px;font-family:var(--font);font-size:1.2em;
+  font-weight:600;text-align:center;letter-spacing:8px;margin-bottom:8px}
+.modal-box input:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px var(--accg)}
+.modal-err{color:var(--red);font-size:.75em;font-weight:600;height:16px;margin-bottom:8px;text-align:center}
+.modal-btns{display:flex;gap:8px}
+.modal-btns button{flex:1;padding:9px;border:none;border-radius:var(--radius-sm);
+  font-family:var(--font);font-size:.82em;font-weight:700;cursor:pointer;transition:all var(--tr)}
+.mb-ok{background:var(--acc);color:#fff}.mb-ok:hover{opacity:.85}
+.mb-cancel{background:var(--bgi);color:var(--txt2);border:1px solid var(--brd)!important}
+.mb-cancel:hover{color:var(--txt)}
+
 /* RESPONSIVE */
 @media(max-width:900px){
   .top-half{grid-template-columns:1fr}
@@ -178,8 +204,23 @@ body{background:var(--bg);color:var(--txt);font-family:var(--font);font-size:14p
       </div>
     </div>
     <div class="header-right">
+      <button class="tbtn locked" id="lockBtn" onclick="toggleLock()" title="Lock/Unlock controls">&#128274;</button>
       <button class="tbtn" id="langBtn" onclick="toggleLang()">IT</button>
       <button class="tbtn" id="themeBtn" onclick="toggleTheme()">&#9788;</button>
+    </div>
+  </div>
+</div>
+
+<!-- PIN Modal -->
+<div id="pinModal" class="modal-ovl" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title" data-i18n="pin_title">Unlock Controls</div>
+    <div class="modal-msg" data-i18n="pin_msg">Enter PIN to send commands to the incubator.</div>
+    <input type="password" inputmode="numeric" id="pinInput" maxlength="10" autocomplete="off" onkeydown="if(event.key==='Enter')submitPin()">
+    <div class="modal-err" id="pinErr"></div>
+    <div class="modal-btns">
+      <button class="mb-cancel" onclick="cancelPin()" data-i18n="cancel">Cancel</button>
+      <button class="mb-ok" onclick="submitPin()" data-i18n="unlock">Unlock</button>
     </div>
   </div>
 </div>
@@ -276,7 +317,9 @@ const LANG={
     mqtt_connected:'MQTT: Connected',mqtt_connecting:'MQTT: Connecting...',
     mqtt_reconnecting:'MQTT: Reconnecting...',mqtt_disconnected:'MQTT: Disconnected',
     waiting_data:'waiting for incubator...',data_live:'receiving data',
-    pid_advanced:'PID Advanced'},
+    pid_advanced:'PID Advanced',
+    pin_title:'Unlock Controls',pin_msg:'Enter PIN to send commands to the incubator.',
+    pin_wrong:'Wrong PIN',unlock:'Unlock',cancel:'Cancel',locked_hint:'Controls locked — tap the lock icon to unlock'},
   it:{temp:'Temperatura',temp_avg:'Temp media 5m',humidity:'Umidità',hum_avg:'UR media 5m',
     rh_target:'UR Target',chart_title:'Storico Temperature',controls:'Controlli',
     parameters:'Parametri',fan:'Ventola %',apply:'Applica',erase_log:'Cancella Log',
@@ -287,7 +330,9 @@ const LANG={
     mqtt_connected:'MQTT: Connesso',mqtt_connecting:'MQTT: Connessione...',
     mqtt_reconnecting:'MQTT: Riconnessione...',mqtt_disconnected:'MQTT: Disconnesso',
     waiting_data:'in attesa dell\'incubatore...',data_live:'dati in arrivo',
-    pid_advanced:'PID Avanzato'}
+    pid_advanced:'PID Avanzato',
+    pin_title:'Sblocca Controlli',pin_msg:'Inserisci il PIN per inviare comandi all\'incubatore.',
+    pin_wrong:'PIN errato',unlock:'Sblocca',cancel:'Annulla',locked_hint:'Controlli bloccati — tocca l\'icona del lucchetto per sbloccare'}
 };
 let cLang=localStorage.getItem('phoenix-lang')||'en';
 function t(k){return LANG[cLang][k]||LANG.en[k]||k}
@@ -400,7 +445,42 @@ function processStatus(d){
   document.getElementById('sbar').textContent=(d.running?t('running'):t('aborted'))+' | Log: '+d.log_entries+' | MQTT OK';
 }
 
-function sendCmd(o){if(mqtt_c&&mqtt_c.connected)mqtt_c.publish(T_CMD,JSON.stringify(o));else alert(t('mqtt_not_connected'))}
+const UI_PIN='5980';
+let uiUnlocked=false;
+let pendingCmd=null;
+function updateLockUi(){
+  const b=document.getElementById('lockBtn');
+  if(uiUnlocked){b.innerHTML='&#128275;';b.classList.remove('locked');b.classList.add('unlocked');document.body.classList.remove('ui-locked')}
+  else{b.innerHTML='&#128274;';b.classList.remove('unlocked');b.classList.add('locked');document.body.classList.add('ui-locked')}
+}
+function openPinModal(){
+  document.getElementById('pinInput').value='';
+  document.getElementById('pinErr').textContent='';
+  document.getElementById('pinModal').style.display='flex';
+  setTimeout(()=>document.getElementById('pinInput').focus(),50);
+}
+function closePinModal(){document.getElementById('pinModal').style.display='none'}
+function submitPin(){
+  const v=document.getElementById('pinInput').value;
+  if(v===UI_PIN){
+    uiUnlocked=true;updateLockUi();closePinModal();
+    if(pendingCmd){const c=pendingCmd;pendingCmd=null;sendCmd(c)}
+  }else{
+    document.getElementById('pinErr').textContent=t('pin_wrong');
+    document.getElementById('pinInput').value='';
+    document.getElementById('pinInput').focus();
+  }
+}
+function cancelPin(){pendingCmd=null;closePinModal()}
+function toggleLock(){
+  if(uiUnlocked){uiUnlocked=false;updateLockUi()}
+  else openPinModal();
+}
+function sendCmd(o){
+  if(!uiUnlocked){pendingCmd=o;openPinModal();return}
+  if(mqtt_c&&mqtt_c.connected)mqtt_c.publish(T_CMD,JSON.stringify(o));
+  else alert(t('mqtt_not_connected'))
+}
 function doAbort(){if(!confirm(t('confirm_abort')))return;sendCmd({cmd:'abort'})}
 function doStart(){sendCmd({cmd:'start'})}
 function doApply(){sendCmd({cmd:'set',t_set:parseFloat(document.getElementById('p_tset').value),
@@ -428,7 +508,7 @@ setInterval(()=>{
   }
 },3000);
 
-updateThemeBtn();updateLogo();applyLang();initChart();connectMQTT();
+updateThemeBtn();updateLogo();applyLang();updateLockUi();initChart();connectMQTT();
 </script>
 </body>
 </html>
